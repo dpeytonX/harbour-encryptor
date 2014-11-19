@@ -1,0 +1,3 @@
+module harbour.encryptor.SailfishWidgets.Settings
+plugin applicationsettings
+typeinfo settings.qmltypes

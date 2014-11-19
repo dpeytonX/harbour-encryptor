@@ -18,14 +18,17 @@ SOURCES += src/harbour-encryptor.cpp \
     src/filelist.cpp
 
 OTHER_FILES += qml/harbour-encryptor.qml \
-    qml/cover/CoverPage.qml \
-    qml/pages/FirstPage.qml \
-    qml/pages/SecondPage.qml \
-    rpm/harbour-encryptor.changes.in \
-    rpm/harbour-encryptor.spec \
-    rpm/harbour-encryptor.yaml \
+    qml/cover/* \
+    qml/pages/* \
+    rpm/* \
     translations/*.ts \
+    harbour/* \
     harbour-encryptor.desktop
+
+QML_IMPORT_PATH = .
+encryptor.files = harbour
+encryptor.path = /usr/share/$${TARGET}
+INSTALLS += encryptor
 
 # to disable building translations every time, comment out the
 # following CONFIG line
