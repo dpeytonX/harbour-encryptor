@@ -42,3 +42,4 @@ HEADERS += \
     src/filelist.h \
     src/file.h
 
+include(src/qtdeclarative-helper/declarativelist.pri)

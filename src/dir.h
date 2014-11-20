@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QObject>
 #include <QString>
+#include <QQmlListProperty>
 
 /**
  * @brief The Dir class
@@ -26,17 +27,33 @@
 class Dir : public QObject,QDir
 {
     Q_OBJECT
+    Q_PROPERTY(QString dirName READ dirName)
+    Q_PROPERTY(QQmlListProperty<QString> fileList READ fileList CONSTANT)
+    Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
     Q_PROPERTY(QString XdgConfig MEMBER m_configDir CONSTANT)
     Q_PROPERTY(QString XdgData MEMBER m_dataDir CONSTANT)
     Q_PROPERTY(QString XdgCache MEMBER m_cacheDir CONSTANT)
     Q_PROPERTY(QString XdgHome MEMBER m_homeDir CONSTANT)
-    Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
 
 public:
     explicit Dir(QObject *parent = 0);
 
-    QString path() const {
-        return QDir::path();
+    Q_INVOKABLE QString absoluteFilePath(QFile* file) {
+        return absoluteFilePath(file->fileName());
+    }
+
+    Q_INVOKABLE QString absoluteFilePath(const QString& name) {
+        return QDir::absoluteFilePath(name);
+    }
+
+    QQmlListProperty<QString> fileList();
+
+    Q_INVOKABLE QString filePath(QFile* file) {
+        return filePath(file->fileName());
+    }
+
+    Q_INVOKABLE QString filePath(const QString& name) {
+        return QDir::filePath(name);
     }
 
     void setPath(const QString &path) {

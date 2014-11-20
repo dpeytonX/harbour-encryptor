@@ -1,5 +1,5 @@
 #include "file.h"
 
-File::File()
+File::File(const QString &name, QObject *parent) : QFile(name, parent)
 {
 }

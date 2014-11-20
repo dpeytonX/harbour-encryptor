@@ -1,7 +1,10 @@
 #ifndef FILELIST_H
 #define FILELIST_H
 
-class FileList
+#include "file.h"
+#include "qtdeclarative-helper/declarativelist.h"
+
+class FileList: public DeclarativeList<File>
 {
 public:
     FileList();
