@@ -6,21 +6,27 @@ import harbour.encryptor.SailfishWidgets.Components 1.1
   Only handles selecting files and returns those files back to user
 
   Qml                           Instantiates
-  This dialog -------------> Qml DirectoryQuery (handles all operations)
+  This dialog -------------> Qml DirectoryInfo (handles all operations)
                                 Sends back
   dynamically <-------------- list of QFiles matching request
   populates list view
 
   TODO:
-      -write basic signal to return data
+      -mock navigation
       -create a parent page to mimick real work flow
-      -get data back from signal
       -start backend directoryquery
   */
 
 Dialog {
     property Item contextMenu
     property alias header: listView.header
+    property string selectText: "Select"
+    property string deselectText: "Deselect"
+    //TODO: selected files should not be list objects because they will be destroyed
+    property variant selectedFiles: []
+    property bool multiSelect: false
+
+    signal filesSelected(variant files)
 
     BasicListView {
         anchors.fill: parent
@@ -48,36 +54,51 @@ Dialog {
         }
 
         delegate: ListItem {
-            property bool menuVisible: !!contextMenu && contextMenu.parent == this
-
             id: contentItem
-            height: menuVisible ? contextMenu.height + fileItem.height : fileItem.height
+            menu: contextMenuComponent
+            property bool selected: false
 
-
-            BackgroundItem {
-                id: fileItem
-
-                InformationalLabel {
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: Theme.paddingLarge
-                    text: name
-                }
-                //TODO: choose icon based on fileType
-                //TODO: create a context menu on press and hold
-
-                onPressAndHold: {
-                    if(!contextMenu)
-                        contextMenu = contextMenuComponent.createObject(listView)
-                    contextMenu.show(contentItem)
-                }
+            InformationalLabel {
+                anchors.verticalCenter: parent.verticalCenter
+                color: selected ? Theme.highlightColor : Theme.primaryColor
+                text: name
+                x: Theme.paddingLarge
             }
         }
+
 
         Component {
             id:contextMenuComponent
             ContextMenu {
+                id: context
                 StandardMenuItem {
-                    text: "Option 1"
+                    text: !!context.parent ? (context.parent.selected ? deselectText : selectText) : ""
+                    onClicked: {
+                        var li = context.parent
+                        if(li.selected) {
+                            //deselect
+                            var i = selectedFiles.indexOf(li)
+                            var temp = selectedFiles;
+                            temp.splice(i, 1)
+                            selectedFiles = temp
+                            console.log("selectedFiles[] : " + selectedFiles.toString())
+                            li.selected = false
+                        } else {
+                            if(!multiSelect) {
+                                //remove previous entries
+                                for(var i = 0; i < selectedFiles.length; i++) {
+                                    selectedFiles[i].selected = false
+                                }
+                                selectedFiles = []
+                                console.log("selectedFiles[] : " + selectedFiles.toString())
+                            }
+
+                            selectedFiles = selectedFiles.concat(li)
+                            console.log("selectedFiles[] : " + selectedFiles.toString())
+                            li.selected = !li.selected
+                            li.selected = true
+                        }
+                    }
                 }
             }
         }
@@ -85,6 +106,10 @@ Dialog {
         VerticalScrollDecorator {}
     }
 
+    onAccepted: {
+        filesSelected(selectedFiles)
+        console.log("accepted: " + selectedFiles)
+    }
 }
 
 
