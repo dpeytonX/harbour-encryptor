@@ -7,6 +7,9 @@
 #include <QString>
 #include <QQmlListProperty>
 
+#include "file.h"
+#include "qtdeclarative-helper/declarativelist.h"
+
 /**
  * @brief The Dir class
  *
@@ -24,11 +27,12 @@
  *
  * Q_GADGET
  */
-class Dir : public QObject,QDir
+class Dir : public QObject,QDir,DeclarativeList<File>
 {
     Q_OBJECT
     Q_PROPERTY(QString dirName READ dirName)
-    Q_PROPERTY(QQmlListProperty<QString> fileList READ fileList CONSTANT)
+    Q_PROPERTY(QStringList entries READ entryList CONSTANT)
+    Q_PROPERTY(QQmlListProperty<File> files READ fileList CONSTANT)
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
     Q_PROPERTY(QString XdgConfig MEMBER m_configDir CONSTANT)
     Q_PROPERTY(QString XdgData MEMBER m_dataDir CONSTANT)
@@ -46,7 +50,9 @@ public:
         return QDir::absoluteFilePath(name);
     }
 
-    QQmlListProperty<QString> fileList();
+    QStringList entryList();
+
+    QQmlListProperty<File> fileList();
 
     Q_INVOKABLE QString filePath(QFile* file) {
         return filePath(file->fileName());

@@ -16,7 +16,6 @@ CONFIG += sailfishapp
 
 SOURCES += src/harbour-encryptor.cpp \
     src/dir.cpp \
-    src/filelist.cpp \
     src/file.cpp
 
 OTHER_FILES += qml/harbour-encryptor.qml \
@@ -39,7 +38,6 @@ TRANSLATIONS += translations/harbour-encryptor-de.ts
 
 HEADERS += \
     src/dir.h \
-    src/filelist.h \
     src/file.h
 
 include(src/qtdeclarative-helper/declarativelist.pri)

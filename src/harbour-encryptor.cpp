@@ -36,7 +36,6 @@
 
 #include <sailfishapp.h>
 #include "dir.h"
-#include "filelist.h"
 #include "file.h"
 
 
@@ -51,8 +50,9 @@ int main(int argc, char *argv[])
     //
     // To display the view, call "show()" (will show fullscreen on device).
 
-    qmlRegisterType<Dir>("harbour.encryptor.Encryptor", 1, 0, "Dir");
-    //qmlRegisterType<File>("harbour.encryptor.Encryptor", 1, 0, "File");
+    qmlRegisterType<File>("harbour.encryptor.Encryptor", 1, 0, "File"); //must be 1st
+    qmlRegisterType<Dir>("harbour.encryptor.Encryptor", 1, 0, "Dir");    
+
     //qmlRegisterType<FileList>("harbour.encryptor.Encryptor", 1, 0, "FileList");
 
     return SailfishApp::main(argc, argv);

@@ -53,10 +53,7 @@ Dialog {
 
     ListModel {
         id: list2
-        ListElement {name: "File 1"; fileType: "file"}
-        ListElement {name: "File 2"; fileType: "file"}
-        ListElement {name: "File 3"; fileType: "file"}
-        ListElement {name: "File 4"; fileType: "file"}
+
     }
 
     BasicListView {
@@ -71,7 +68,7 @@ Dialog {
         }
 
         //TODO: create fileType enum
-        model: list1
+        model: fileList.files
 
         delegate: ListItem {
             id: contentItem
@@ -81,7 +78,7 @@ Dialog {
             InformationalLabel {
                 anchors.verticalCenter: parent.verticalCenter
                 color: selected ? Theme.highlightColor : Theme.primaryColor
-                text: name
+                text: modelData.fileName
                 x: Theme.paddingLarge
             }
 
@@ -147,6 +144,7 @@ Dialog {
 
     function navigate() {
         console.log("navigate called " + fileList.path)
+        console.log("files " + fileList.files[0])
     }
 }
 
