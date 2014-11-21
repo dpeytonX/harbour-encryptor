@@ -38,3 +38,6 @@ var iconCoverNextSong = "image://theme/icon-cover-next-song"
 var iconCoverPause = "image://theme/icon-cover-pause"
 var iconCoverPrevious = "image://theme/icon-cover-previous"
 var iconCoverShuffle = "image://theme/icon-cover-shuffle"
+
+var iconDirectory = "image://theme/icon-m-common-directory"
+var iconFile = "image://theme/icon-m-content-file-unknown"

@@ -8,11 +8,12 @@ class File : public QFile, QFileInfo
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool dir READ isDir CONSTANT)
-    Q_PROPERTY(bool exists READ exists CONSTANT)
+    Q_PROPERTY(bool dir READ isDir NOTIFY fileNameChanged)
+    Q_PROPERTY(bool exists READ exists NOTIFY fileNameChanged)
+    Q_PROPERTY(bool file READ isFile NOTIFY fileNameChanged)
+    Q_PROPERTY(bool hidden READ isHidden NOTIFY fileNameChanged)
+    Q_PROPERTY(QString absoluteFilePath READ absoluteFilePath CONSTANT)
     Q_PROPERTY(QString fileName READ fileName WRITE setFileName NOTIFY fileNameChanged)
-    Q_PROPERTY(bool file READ isFile CONSTANT)
-    Q_PROPERTY(bool hidden READ isHidden CONSTANT)
 public:
     explicit File();
     File(const QString &name, QObject *parent=0);

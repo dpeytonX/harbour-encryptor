@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.encryptor.SailfishWidgets.Components 1.1
+import harbour.encryptor.SailfishWidgets.JS 1.1
 import harbour.encryptor.Encryptor 1.0
 
 /*!
@@ -11,24 +12,23 @@ import harbour.encryptor.Encryptor 1.0
                                 Sends back
   dynamically <-------------- list of QFiles matching request
   populates list view
-
-  TODO:
-      -mock navigation
-      -start backend directoryquery
   */
 Dialog {
-    property Item contextMenu
+    property alias directory: fileList
+    property alias filter: fileList.filter
+    property alias header: listView.header
+    property alias sort: fileList.sort
+    property bool multiSelect: false
+    property bool quickSelect: false //should be based on file filter
     property string acceptText
     property string baseDirectory: fileList.XdgHome
     property string cancelText
-    property string deselectText: "Deselect"
-    property real filter: Dir.NoFilter
-    property alias header: listView.header
+    property string deselectText
     property string headerTitle
-    property bool multiSelect: false
-    property bool quickSelect: false //should be based on file filter
+    property string selectText
     property variant selectedFiles: []
-    property string selectText: "Select"
+
+    property enumeration myval
 
     canAccept: !!selectedFiles && !!(selectedFiles.length)
     id: fileSelector
@@ -52,16 +52,31 @@ Dialog {
             id: contentItem
             menu: contextMenuComponent
             property bool selected: false
-            property File model: modelData
+            property File file: modelData
 
-            InformationalLabel {
-                anchors.verticalCenter: parent.verticalCenter
-                color: selected ? Theme.highlightColor : Theme.primaryColor
-                text: modelData.fileName
-                x: Theme.paddingLarge
+            Image {
+                x: Theme.paddingSmall
+                height: file.dir ? parent.height - Theme.paddingSmall : 0
+                width: height
+                id: icon
+                source: file.dir ? IconThemes.iconDirectory : ""
             }
 
-            onClicked: if(quickSelect) makeSelection(this)
+            InformationalLabel {
+                anchors.left: icon.right
+                anchors.leftMargin: Theme.paddingSmall
+                anchors.verticalCenter: parent.verticalCenter
+                color: selected ? Theme.primaryColor : Theme.highlightColor
+                text: file.fileName
+            }
+
+            onClicked: {
+                if(file.dir) {
+                    fileList.path = file.absoluteFilePath
+                } else {
+                    if(quickSelect) makeSelection(this)
+                }
+            }
         }
 
 
@@ -81,24 +96,28 @@ Dialog {
         VerticalScrollDecorator {}
     }
 
+    Dir {
+        id: fileList
+        filter: Dir.NoFilter
+        sort: Dir.DirsFirst | Dir.Name
+
+        onPathChanged: {clearSelection(); refresh()}
+    }
+
     onBaseDirectoryChanged: fileList.path = baseDirectory
 
-    onRejected: { for(var i = 0; i < selectedFiles.length; i++) makeSelection(selectedFiles[i]) }
+    onRejected: clearSelection()
+
+    function clearSelection() {
+        for(var i = 0; !!selectedFiles && i < selectedFiles.length; i++) makeSelection(listView.selectedListItems[i])
+    }
 
     function makeSelection(li) {
         if(li.selected) {
             //deselect
-            var i = listView.selectedListItems.indexOf(li)
-            var temp = listView.selectedListItems;
-            temp.splice(i, 1)
-            listView.selectedListItems = temp
+            listView.selectedListItems = Variant.remove(listView.selectedListItems, li)
+            selectedFiles = Variant.remove(selectedFiles, li.file)
 
-            i = selectedFiles.indexOf(li.model)
-            temp = selectedFiles;
-            temp.splice(i, 1)
-            selectedFiles = temp
-
-            console.log("selectedFiles[] : " + selectedFiles)
             li.selected = false
         } else {
             if(!multiSelect) {
@@ -108,30 +127,16 @@ Dialog {
                 }
                 listView.selectedListItems = []
                 selectedFiles = []
-                console.log("selectedFiles[] : " + selectedFiles)
             }
+            listView.selectedListItems = Variant.add(listView.selectedListItems, li)
+            selectedFiles = Variant.add(selectedFiles, li.file)
 
-            listView.selectedListItems = listView.selectedListItems.concat(li)
-            selectedFiles = selectedFiles.concat(li.model)
-            console.log("selectedFiles[] : " + selectedFiles)
-
-            li.selected = !li.selected
             li.selected = true
         }
 
         canAccept = selectedFiles.length
     }
 
-    Dir {
-        id: fileList
-
-        onPathChanged: navigate()
-    }
-
-    function navigate() {
-        console.log("navigate called " + fileList.path)
-        console.log("files " + fileList.files)
-    }
 }
 
 

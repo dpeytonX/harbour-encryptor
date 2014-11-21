@@ -8,27 +8,27 @@ const QString Dir::m_homeDir = QDir::homePath();
 
 Dir::Dir(QObject *parent) :
     QObject(parent),
-    QDir()
+    QDir(),
+    m_fileList(QQmlListProperty<File>(this, 0,
+                                      &Dir::dclAppendObject,
+                                      &Dir::dclCountObject,
+                                      &Dir::dclAtIndex,
+                                      &Dir::dclClearObject))
 {
+
 }
 
 QStringList Dir::entryList() {
-    qDebug() << "filter: " << m_filter;
-    return QDir::entryList(Filters(m_filter), QDir::DirsFirst | QDir::Name);
+    return QDir::entryList(Filters(m_filter) | QDir::Readable, SortFlags(m_sort));
 }
 
-QQmlListProperty<File> Dir::fileList() {
-    if(!getList().size())
+QQmlListProperty<File> Dir::files() {
+    if(getList().isEmpty()) {
         foreach(QString s, entryList()) {
+            qDebug() << "abs file path " << absoluteFilePath(s);
             getList().append(new File(absoluteFilePath(s), this));
         }
-
-    QQmlListProperty<File> myQmlList = QQmlListProperty<File>(this, 0,
-                                                              &Dir::dclAppendObject,
-                                                              &Dir::dclCountObject,
-                                                              &Dir::dclAtIndex,
-                                                              &Dir::dclClearObject);
-    emit fileListChanged();
-    return myQmlList;
+    }
+    return m_fileList;
 }
 

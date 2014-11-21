@@ -7,6 +7,8 @@
 #include <QString>
 #include <QQmlListProperty>
 
+#include <QDebug>
+
 #include "file.h"
 
 /**
@@ -15,16 +17,9 @@
  * No point in reinventing the wheel.
  * This class will be a QDir wrapper with functions exposed to the QML Engine.
  *
- * http://www.cprogramming.com/tutorial/enum.html
- * qt-project.org/doc/qt-5/qstandardpaths.html
- * https://github.com/sailfish-sdk/xdg-helper/blob/master/README.qt5
- * http://qt-project.org/doc/qt-5/qtqml-cppintegration-exposecppattributes.html
- * http://qt-project.org/doc/qt-5/qobject.html#Q_PROPERTY
+ * TODO:
+ * Copy over SailfishWidgets.JS folder
  *
- * File(Info) List
- * https://github.com/prplmnky/qtdeclarative-helper
- *
- * Q_GADGET
  */
 class Dir : public QObject,QDir
 {
@@ -33,20 +28,22 @@ class Dir : public QObject,QDir
     Q_ENUMS(DirFilter)
     Q_ENUMS(DirSortFlag)
 
-    Q_PROPERTY(QString dirName READ dirName)
-    Q_PROPERTY(QStringList entries READ entryList CONSTANT)
-    Q_PROPERTY(QQmlListProperty<File> files READ fileList NOTIFY fileListChanged)
-    //Q_PROPERTY(int filter READ filter WRITE setFilter NOTIFY filterChanged)
-    Q_PROPERTY(int filter MEMBER m_filter NOTIFY filterChanged())
+    Q_PROPERTY(bool root READ isRoot NOTIFY pathChanged)
+    Q_PROPERTY(int filter READ filter WRITE setFilter NOTIFY filterChanged)
+    Q_PROPERTY(int sort READ sort WRITE setSort NOTIFY sortChanged)
+    Q_PROPERTY(QQmlListProperty<File> files READ files NOTIFY filesChanged)
+    Q_PROPERTY(QString dirName READ dirName NOTIFY pathChanged)
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
+    Q_PROPERTY(QString XdgCache MEMBER m_cacheDir CONSTANT)
     Q_PROPERTY(QString XdgConfig MEMBER m_configDir CONSTANT)
     Q_PROPERTY(QString XdgData MEMBER m_dataDir CONSTANT)
-    Q_PROPERTY(QString XdgCache MEMBER m_cacheDir CONSTANT)
     Q_PROPERTY(QString XdgHome MEMBER m_homeDir CONSTANT)
+    Q_PROPERTY(QStringList entries READ entryList CONSTANT)
 
 public:
     explicit Dir(QObject *parent = 0);
 
+    /*** START: Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies). Under GPL Version 3 License ***/
     enum DirFilter { Dirs        = 0x001,
                   Files       = 0x002,
                   Drives      = 0x004,
@@ -88,42 +85,60 @@ public:
                     Type        = 0x80,
                     NoSort = -1
     };
-
-    Q_INVOKABLE QString absoluteFilePath(QFile* file) {
-        return absoluteFilePath(file->fileName());
-    }
-
-    Q_INVOKABLE QString absoluteFilePath(const QString& name) {
-        return QDir::absoluteFilePath(name);
-    }
+    /*** End: Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies). Under GPL Version 3 License ***/
 
     QStringList entryList();
 
-    QQmlListProperty<File> fileList();
+    QQmlListProperty<File> files();
 
-    Q_INVOKABLE QString filePath(QFile* file) {
-        return filePath(file->fileName());
+    Q_INVOKABLE void refresh() {
+        clearList();
+        files();
+        emit filesChanged();
     }
 
-    Q_INVOKABLE QString filePath(const QString& name) {
-        return QDir::filePath(name);
+    QString dirName() const {
+        return isRoot() ? root().path() : QDir::dirName();
     }
 
-    int getFilter() {
+    int filter() const {
         return m_filter;
     }
 
-    /*void setFilter(int filter) {
+    void setFilter(int filter) {
         m_filter = filter;
         emit filterChanged();
     }
 
-    void setPath(const QString &path) {
-        QDir::setPath(path);
+    void setPath(const QString &p) {
+        QDir nPath(p);
+        //Weird workaround for inifinite /../..
+        QDir::setPath(nPath.path() == "/.." ? "/" : nPath.absolutePath());
+        qDebug() << "path is now " << path();
         emit pathChanged();
-    }*/
+    }
 
-    //////////////////////
+    int sort() const {
+        return m_sort;
+    }
+
+    void setSort(int sort) {
+        m_sort = sort;
+        emit sortChanged();
+    }
+
+    QList<File *>& getList() {
+        return m_list;
+    }
+
+    void clearList() {
+        foreach(File *o, m_list) {
+            if(o) o->deleteLater(); //Could still be in use by QML
+        }
+        m_list.clear();
+    }
+
+    // QQmlListProperty helpers
     static void dclAppendObject(QQmlListProperty<File> *obj, File *model) {
         Dir *backEnd = dynamic_cast<Dir*>(obj->object);
         if(backEnd) {
@@ -154,47 +169,22 @@ public:
         return 0;
     }
 
-    QList<File *>& getList() {
-        return list;
-    }
-
-    void setManageMemory(bool manageMemory) {
-        this->manageMemory = manageMemory;
-    }
-
-    bool doManageMemory() {
-        return manageMemory;
-    }
-
-    void clearList() {
-        foreach(File *o, list) {
-            if(o && doManageMemory()) {
-                delete o;
-            }
-        }
-        list.clear();
-        emit fileListChanged();
-    }
-
-public slots:
-    void refresh() {clearList(); fileList();}
-
 signals:
     void pathChanged();
     void filterChanged();
-    void fileListChanged();
+    void filesChanged();
+    void sortChanged();
 
 private:
+   int m_filter;
+   int m_sort;
+   QList<File*> m_list;
+   QQmlListProperty<File> m_fileList;
+
+   static const QString m_cacheDir;
    static const QString m_configDir;
    static const QString m_dataDir;
-   static const QString m_cacheDir;
    static const QString m_homeDir;
-   int m_filter;
-   QString m_path;
-
-   QList<File*> list;
-   bool manageMemory;
-
 };
 
 #endif // FILELIST_H

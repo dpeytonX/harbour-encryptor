@@ -22,21 +22,15 @@ Page {
             text: !!inFile ? inFile.fileName : ""
         }
 
-        Label {
-            text: Dir.Files
-        }
-
         FileSelector {
-            acceptText: canAccept ? selectedFiles.length + " file(s)" : ""
-            filter: Dir.Files
-            headerTitle: "Select encrypted file"
+            acceptText: canAccept ? selectedFiles.length + " file(s)" : directory.dirName
+            headerTitle: ""
             id: fileSelector
             quickSelect: true
+            filter: Dir.AllEntries | Dir.Hidden
+            selectText: "Select"
+            deselectText: "Deselect"
 
-            onFilterChanged: {
-                console.log("filter: " + filter)
-                refresh()
-            }
             onRejected: inFile = null
             onAccepted: inFile = selectedFiles[0]
         }
