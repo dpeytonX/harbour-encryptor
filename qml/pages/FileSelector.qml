@@ -19,7 +19,7 @@ Dialog {
     property alias header: listView.header
     property alias sort: fileList.sort
     property bool multiSelect: false
-    property bool quickSelect: true //should be based on file filter
+    property bool quickSelect: true
     property int selectionFilter: Dir.AllEntries | Dir.Readable | Dir.Hidden
     property string acceptText: directory.dirName
     property string baseDirectory: fileList.XdgHome
@@ -34,17 +34,6 @@ Dialog {
 
     BasicListView {
         anchors.fill: parent
-        id: listView
-
-        header: DialogHeader {
-            acceptText: fileSelector.acceptText
-            cancelText: fileSelector.cancelText
-            id: dialogHeader
-            title: fileSelector.headerTitle
-        }
-
-        model: fileList.files
-
         delegate: ListItem {
             property bool selected: false
             property File file: modelData
@@ -79,6 +68,14 @@ Dialog {
 
             Component.onCompleted: listView.updateSelected()
         }
+        header: DialogHeader {
+            acceptText: fileSelector.acceptText
+            cancelText: fileSelector.cancelText
+            id: dialogHeader
+            title: fileSelector.headerTitle
+        }
+        id: listView
+        model: fileList.files
 
 
         Component {
@@ -118,13 +115,11 @@ Dialog {
     onRejected: clearSelection()
 
     function clearSelection() {
-        console.log("clear selection " + selectedFiles)
         while(selectedFiles.length) makeSelection(selectedFiles[0])
     }
 
     function makeSelection(file) {
         if(selectedFiles.indexOf(file) != -1) {
-            console.log("removing selection: " + selectedFiles)
             selectedFiles = Variant.remove(selectedFiles, file)
         } else {
             if(!matchSelectionFilter(file))
