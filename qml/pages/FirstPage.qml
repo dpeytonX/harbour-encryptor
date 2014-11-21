@@ -1,8 +1,11 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.encryptor.SailfishWidgets.Components 1.1
+import harbour.encryptor.Encryptor 1.0
 
 Page {
+
+    property File inFile
 
     PageColumn {
         title: "GPG Decryption"
@@ -16,7 +19,7 @@ Page {
 
         Label {
             id: results
-            text: fileSelector.selectedFiles.toString()
+            text: !!inFile ? inFile.fileName : ""
         }
 
         FileSelector {
@@ -24,6 +27,9 @@ Page {
             headerTitle: "Select encrypted file"
             id: fileSelector
             quickSelect: true
+
+            onRejected: inFile = null
+            onAccepted: inFile = selectedFiles[0]
         }
     }
 }

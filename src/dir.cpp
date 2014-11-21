@@ -1,7 +1,5 @@
 #include "dir.h"
 
-#include<QDebug>
-
 const QString Dir::m_configDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
 const QString Dir::m_dataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 const QString Dir::m_cacheDir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
@@ -9,8 +7,7 @@ const QString Dir::m_homeDir = QDir::homePath();
 
 Dir::Dir(QObject *parent) :
     QObject(parent),
-    QDir(),
-    DeclarativeList<File>()
+    QDir()
 {
 }
 
@@ -19,17 +16,16 @@ QStringList Dir::entryList() {
 }
 
 QQmlListProperty<File> Dir::fileList() {
-    //FileList* files = new FileList(this);
-    getList().clear();
+    if(!getList().size())
+        foreach(QString s, entryList()) {
+            getList().append(new File(absoluteFilePath(s), this));
+        }
 
-    QList<File*> myFiles;
-
-    foreach(QString s, entryList()) {
-        myFiles.append(new File(absoluteFilePath(s), this));
-    }
-
-    qDebug() << myFiles << myFiles.size();
-    QQmlListProperty<File> myList = populate(myFiles, this);
-    qDebug() << this;
-    return myList;
+    QQmlListProperty<File> myQmlList = QQmlListProperty<File>(this, 0,
+                                                              &Dir::dclAppendObject,
+                                                              &Dir::dclCountObject,
+                                                              &Dir::dclAtIndex,
+                                                              &Dir::dclClearObject);
+    return myQmlList;
 }
+

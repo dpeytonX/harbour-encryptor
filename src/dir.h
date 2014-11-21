@@ -8,7 +8,6 @@
 #include <QQmlListProperty>
 
 #include "file.h"
-#include "qtdeclarative-helper/declarativelist.h"
 
 /**
  * @brief The Dir class
@@ -27,7 +26,7 @@
  *
  * Q_GADGET
  */
-class Dir : public QObject,QDir,DeclarativeList<File>
+class Dir : public QObject,QDir
 {
     Q_OBJECT
     Q_PROPERTY(QString dirName READ dirName)
@@ -67,6 +66,61 @@ public:
         emit pathChanged();
     }
 
+    //////////////////////
+    static void dclAppendObject(QQmlListProperty<File> *obj, File *model) {
+        Dir *backEnd = dynamic_cast<Dir*>(obj->object);
+        if(backEnd) {
+            backEnd->getList().append(model);
+        }
+    }
+
+    static void dclClearObject(QQmlListProperty<File> *obj) {
+        Dir *backEnd = dynamic_cast<Dir*>(obj->object);
+        if(backEnd) {
+            backEnd->clearList();
+        }
+    }
+
+    static File* dclAtIndex(QQmlListProperty<File> *obj, int index) {
+        Dir *backEnd = dynamic_cast<Dir*>(obj->object);
+        if(backEnd) {
+            return (backEnd->getList())[index];
+        }
+        return 0;
+    }
+
+    static int dclCountObject(QQmlListProperty<File> *obj) {
+        Dir *backEnd = dynamic_cast<Dir*>(obj->object);
+        if(backEnd) {
+            return backEnd->getList().size();
+        }
+        return 0;
+    }
+
+    QList<File *>& getList() {
+        return list;
+    }
+
+    void setManageMemory(bool manageMemory) {
+        this->manageMemory = manageMemory;
+    }
+
+    bool doManageMemory() {
+        return manageMemory;
+    }
+
+    void clearList() {
+        foreach(File *o, list) {
+            if(o && doManageMemory()) {
+                delete o;
+            }
+        }
+        list.clear();
+    }
+
+public slots:
+    void refresh() {clearList();}
+
 signals:
     void pathChanged();
 
@@ -76,6 +130,9 @@ private:
    static const QString m_cacheDir;
    static const QString m_homeDir;
    QString m_path;
+
+   QList<File*> list;
+   bool manageMemory;
 
 signals:
 

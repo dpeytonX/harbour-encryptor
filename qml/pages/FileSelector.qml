@@ -29,36 +29,14 @@ Dialog {
     property variant selectedFiles: []
     property string selectText: "Select"
 
-    signal filesSelected(variant files)
-
     canAccept: !!selectedFiles && !!(selectedFiles.length)
     id: fileSelector
-
-    ListModel {
-        id: list1
-        ListElement {name: ".."; fileType: "dir"}
-        ListElement {name: "."; fileType: "dir"}
-        ListElement {name: "Folder 1"; fileType: "dir"}
-        ListElement {name: "Folder 2"; fileType: "dir"}
-        ListElement {name: "Folder 3"; fileType: "dir"}
-        ListElement {name: "Folder 4"; fileType: "dir"}
-        ListElement {name: "Folder 5"; fileType: "dir"}
-        ListElement {name: "File 1"; fileType: "file"}
-        ListElement {name: "File 2"; fileType: "file"}
-        ListElement {name: "File 3"; fileType: "file"}
-        ListElement {name: "File 4"; fileType: "file"}
-        ListElement {name: ".hidden 1"; fileType: "file"}
-        ListElement {name: ".hidden 2"; fileType: "file"}
-    }
-
-    ListModel {
-        id: list2
-
-    }
 
     BasicListView {
         anchors.fill: parent
         id: listView
+
+        property variant selectedListItems: []
 
         header: DialogHeader {
             acceptText: fileSelector.acceptText
@@ -67,13 +45,13 @@ Dialog {
             title: fileSelector.headerTitle
         }
 
-        //TODO: create fileType enum
         model: fileList.files
 
         delegate: ListItem {
             id: contentItem
             menu: contextMenuComponent
             property bool selected: false
+            property File model: modelData
 
             InformationalLabel {
                 anchors.verticalCenter: parent.verticalCenter
@@ -102,8 +80,6 @@ Dialog {
         VerticalScrollDecorator {}
     }
 
-    onAccepted: filesSelected(selectedFiles)
-
     onBaseDirectoryChanged: fileList.path = baseDirectory
 
     onRejected: { for(var i = 0; i < selectedFiles.length; i++) makeSelection(selectedFiles[i]) }
@@ -111,24 +87,33 @@ Dialog {
     function makeSelection(li) {
         if(li.selected) {
             //deselect
-            var i = selectedFiles.indexOf(li)
-            var temp = selectedFiles;
+            var i = listView.selectedListItems.indexOf(li)
+            var temp = listView.selectedListItems;
+            temp.splice(i, 1)
+            listView.selectedListItems = temp
+
+            i = selectedFiles.indexOf(li.model)
+            temp = selectedFiles;
             temp.splice(i, 1)
             selectedFiles = temp
-            console.log("selectedFiles[] : " + selectedFiles.toString())
+
+            console.log("selectedFiles[] : " + selectedFiles)
             li.selected = false
         } else {
             if(!multiSelect) {
                 //remove previous entries
-                for(var i = 0; i < selectedFiles.length; i++) {
-                    selectedFiles[i].selected = false
+                for(var i = 0; i < listView.selectedListItems.length; i++) {
+                    listView.selectedListItems[i].selected = false
                 }
+                listView.selectedListItems = []
                 selectedFiles = []
-                console.log("selectedFiles[] : " + selectedFiles.toString())
+                console.log("selectedFiles[] : " + selectedFiles)
             }
 
-            selectedFiles = selectedFiles.concat(li)
-            console.log("selectedFiles[] : " + selectedFiles.toString())
+            listView.selectedListItems = listView.selectedListItems.concat(li)
+            selectedFiles = selectedFiles.concat(li.model)
+            console.log("selectedFiles[] : " + selectedFiles)
+
             li.selected = !li.selected
             li.selected = true
         }
@@ -144,7 +129,7 @@ Dialog {
 
     function navigate() {
         console.log("navigate called " + fileList.path)
-        console.log("files " + fileList.files[0])
+        console.log("files " + fileList.files)
     }
 }
 
