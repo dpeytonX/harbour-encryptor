@@ -50,10 +50,8 @@ int main(int argc, char *argv[])
     //
     // To display the view, call "show()" (will show fullscreen on device).
 
-    qmlRegisterType<File>("harbour.encryptor.Encryptor", 1, 0, "File"); //must be 1st
     qmlRegisterType<Dir>("harbour.encryptor.Encryptor", 1, 0, "Dir");
-
-    //qmlRegisterType<FileList>("harbour.encryptor.Encryptor", 1, 0, "FileList");
+    qmlRegisterType<File>("harbour.encryptor.Encryptor", 1, 0, "File");
 
     return SailfishApp::main(argc, argv);
 }
