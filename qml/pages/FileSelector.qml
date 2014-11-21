@@ -13,6 +13,7 @@ import harbour.encryptor.Encryptor 1.0
   dynamically <-------------- list of QFiles matching request
   populates list view
   */
+//TODO: seg fault on long list (possibly due to listitems being deleted out of view)
 Dialog {
     property alias directory: fileList
     property alias filter: fileList.filter
