@@ -33,7 +33,6 @@ import Sailfish.Silica 1.0
    A SilicaListView with a default place holder, scroll decorator, and page header.
 */
 SilicaListView {
-
     /*!
        \qmlproperty alias StandardListView::headerTitle
        Alias to the PageHeader's text. Defaults to blank space.
@@ -44,12 +43,12 @@ SilicaListView {
        Displays "No items" when no items are present. Override to provide custom text.
     */
     property string placeHolderText: qsTr("No items")
+
     header: PageHeader {
         id: pageHeader
         title: " "
     }
     id: listView
-
 
     ViewPlaceholder {
         enabled: !listView.count
