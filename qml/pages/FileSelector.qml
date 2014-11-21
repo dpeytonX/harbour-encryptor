@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import harbour.encryptor.SailfishWidgets.Components 1.1
+import harbour.encryptor.SailfishWidgets.Components 1.2
 import harbour.encryptor.SailfishWidgets.JS 1.1
 import harbour.encryptor.Encryptor 1.0
 
@@ -32,7 +32,7 @@ Dialog {
     canAccept: !!selectedFiles && !!(selectedFiles.length)
     id: fileSelector
 
-    BasicListView {
+    StandardListView {
         anchors.fill: parent
         delegate: ListItem {
             property bool selected: false
@@ -115,7 +115,7 @@ Dialog {
     onRejected: clearSelection()
 
     function clearSelection() {
-        while(selectedFiles.length) makeSelection(selectedFiles[0])
+        while(!!selectedFiles && selectedFiles.length) makeSelection(selectedFiles[0])
     }
 
     function makeSelection(file) {
