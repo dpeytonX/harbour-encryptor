@@ -13,7 +13,6 @@ import harbour.encryptor.Encryptor 1.0
   dynamically <-------------- list of QFiles matching request
   populates list view
   */
-//TODO: seg fault on long list (possibly due to listitems being deleted out of view)
 Dialog {
     property alias directory: fileList
     property alias filter: fileList.filter
@@ -37,10 +36,6 @@ Dialog {
         anchors.fill: parent
         id: listView
 
-        signal updateSelected
-
-        //property variant selectedListItems: []
-
         header: DialogHeader {
             acceptText: fileSelector.acceptText
             cancelText: fileSelector.cancelText
@@ -51,11 +46,12 @@ Dialog {
         model: fileList.files
 
         delegate: ListItem {
+            property bool selected: false
+            property File file: modelData
+
             id: contentItem
             menu: contextMenuComponent
             showMenuOnPressAndHold: matchSelectionFilter(file)
-            property bool selected: false//selectedFiles.indexOf(file) != -1
-            property File file: modelData
 
             Image {
                 x: Theme.paddingSmall
@@ -100,7 +96,7 @@ Dialog {
 
         VerticalScrollDecorator {}
 
-        onUpdateSelected: {
+        function updateSelected() {
             for(var i = 0; i < listView.contentItem.children.length; i++) {
                 var child = listView.contentItem.children[i]
                 if(!!child.file)
@@ -122,35 +118,20 @@ Dialog {
     onRejected: clearSelection()
 
     function clearSelection() {
-        for(var i = 0; !!selectedFiles && i < selectedFiles.length; i++) makeSelection(selectedFiles[i])
+        console.log("clear selection " + selectedFiles)
+        while(selectedFiles.length) makeSelection(selectedFiles[0])
     }
 
     function makeSelection(file) {
-        console.log("make selection: " + file)
         if(selectedFiles.indexOf(file) != -1) {
-            //deselect
-            //listView.selectedListItems = Variant.remove(listView.selectedListItems, li)
-            //selectedFiles = Variant.remove(selectedFiles, li.file)
+            console.log("removing selection: " + selectedFiles)
             selectedFiles = Variant.remove(selectedFiles, file)
-
-            //li.selected = false
         } else {
             if(!matchSelectionFilter(file))
                 return
 
-            if(!multiSelect) {
-                //remove previous entries
-                /*for(var i = 0; i < listView.selectedListItems.length; i++) {
-                    listView.selectedListItems[i].selected = false
-                }
-                listView.selectedListItems = []*/
-                selectedFiles = []
-            }
-            //listView.selectedListItems = Variant.add(listView.selectedListItems, li)
-            //selectedFiles = Variant.add(selectedFiles, li.file)
+            if(!multiSelect) selectedFiles = []
             selectedFiles = Variant.add(selectedFiles, file)
-
-            //li.selected = true
         }
 
         listView.updateSelected()
@@ -173,5 +154,3 @@ Dialog {
         return true
     }
 }
-
-

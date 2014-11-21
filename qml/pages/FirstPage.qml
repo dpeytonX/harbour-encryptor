@@ -27,6 +27,7 @@ Page {
             id: fileSelector
             selectText: "Select"
             deselectText: "Deselect"
+            multiSelect: true
 
             onRejected: inFile = null
             onAccepted: inFile = selectedFiles[0]
