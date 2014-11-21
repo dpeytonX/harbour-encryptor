@@ -22,6 +22,7 @@ Dialog {
     property string baseDirectory: fileList.XdgHome
     property string cancelText
     property string deselectText: "Deselect"
+    property real filter: Dir.NoFilter
     property alias header: listView.header
     property string headerTitle
     property bool multiSelect: false

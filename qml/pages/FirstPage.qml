@@ -22,14 +22,27 @@ Page {
             text: !!inFile ? inFile.fileName : ""
         }
 
+        Label {
+            text: Dir.Files
+        }
+
         FileSelector {
             acceptText: canAccept ? selectedFiles.length + " file(s)" : ""
+            filter: Dir.Files
             headerTitle: "Select encrypted file"
             id: fileSelector
             quickSelect: true
 
+            onFilterChanged: {
+                console.log("filter: " + filter)
+                refresh()
+            }
             onRejected: inFile = null
             onAccepted: inFile = selectedFiles[0]
         }
+    }
+
+    Component.onCompleted: {
+        console.log("dirs: " + Dir.Dirs)
     }
 }

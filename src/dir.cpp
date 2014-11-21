@@ -1,4 +1,5 @@
 #include "dir.h"
+#include <qdebug.h>
 
 const QString Dir::m_configDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
 const QString Dir::m_dataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
@@ -12,7 +13,8 @@ Dir::Dir(QObject *parent) :
 }
 
 QStringList Dir::entryList() {
-    return QDir::entryList(QDir::NoFilter, QDir::DirsFirst | QDir::Name);
+    qDebug() << "filter: " << m_filter;
+    return QDir::entryList(Filters(m_filter), QDir::DirsFirst | QDir::Name);
 }
 
 QQmlListProperty<File> Dir::fileList() {
@@ -26,6 +28,7 @@ QQmlListProperty<File> Dir::fileList() {
                                                               &Dir::dclCountObject,
                                                               &Dir::dclAtIndex,
                                                               &Dir::dclClearObject);
+    emit fileListChanged();
     return myQmlList;
 }
 
