@@ -37,7 +37,9 @@ Dialog {
         anchors.fill: parent
         id: listView
 
-        property variant selectedListItems: []
+        signal updateSelected
+
+        //property variant selectedListItems: []
 
         header: DialogHeader {
             acceptText: fileSelector.acceptText
@@ -51,8 +53,8 @@ Dialog {
         delegate: ListItem {
             id: contentItem
             menu: contextMenuComponent
-            showMenuOnPressAndHold: !!file && matchSelectionFilter(file)
-            property bool selected: false
+            showMenuOnPressAndHold: matchSelectionFilter(file)
+            property bool selected: false//selectedFiles.indexOf(file) != -1
             property File file: modelData
 
             Image {
@@ -75,9 +77,11 @@ Dialog {
                 if(file.dir) {
                     fileList.path = file.absoluteFilePath
                 } else {
-                    if(quickSelect) makeSelection(this)
+                    if(quickSelect) makeSelection(file)
                 }
             }
+
+            Component.onCompleted: listView.updateSelected()
         }
 
 
@@ -88,13 +92,21 @@ Dialog {
                 StandardMenuItem {
                     text: !!context.parent ? (context.parent.selected ? deselectText : selectText) : ""
                     onClicked: {
-                        makeSelection(context.parent)
+                        makeSelection(context.parent.file)
                     }
                 }
             }
         }
 
         VerticalScrollDecorator {}
+
+        onUpdateSelected: {
+            for(var i = 0; i < listView.contentItem.children.length; i++) {
+                var child = listView.contentItem.children[i]
+                if(!!child.file)
+                    child.selected = selectedFiles.indexOf(child.file) != -1
+            }
+        }
     }
 
     Dir {
@@ -110,34 +122,38 @@ Dialog {
     onRejected: clearSelection()
 
     function clearSelection() {
-        for(var i = 0; !!selectedFiles && i < selectedFiles.length; i++) makeSelection(listView.selectedListItems[i])
+        for(var i = 0; !!selectedFiles && i < selectedFiles.length; i++) makeSelection(selectedFiles[i])
     }
 
-    function makeSelection(li) {
-        if(li.selected) {
+    function makeSelection(file) {
+        console.log("make selection: " + file)
+        if(selectedFiles.indexOf(file) != -1) {
             //deselect
-            listView.selectedListItems = Variant.remove(listView.selectedListItems, li)
-            selectedFiles = Variant.remove(selectedFiles, li.file)
+            //listView.selectedListItems = Variant.remove(listView.selectedListItems, li)
+            //selectedFiles = Variant.remove(selectedFiles, li.file)
+            selectedFiles = Variant.remove(selectedFiles, file)
 
-            li.selected = false
+            //li.selected = false
         } else {
-            if(!matchSelectionFilter(li.file))
+            if(!matchSelectionFilter(file))
                 return
 
             if(!multiSelect) {
                 //remove previous entries
-                for(var i = 0; i < listView.selectedListItems.length; i++) {
+                /*for(var i = 0; i < listView.selectedListItems.length; i++) {
                     listView.selectedListItems[i].selected = false
                 }
-                listView.selectedListItems = []
+                listView.selectedListItems = []*/
                 selectedFiles = []
             }
-            listView.selectedListItems = Variant.add(listView.selectedListItems, li)
-            selectedFiles = Variant.add(selectedFiles, li.file)
+            //listView.selectedListItems = Variant.add(listView.selectedListItems, li)
+            //selectedFiles = Variant.add(selectedFiles, li.file)
+            selectedFiles = Variant.add(selectedFiles, file)
 
-            li.selected = true
+            //li.selected = true
         }
 
+        listView.updateSelected()
         canAccept = selectedFiles.length
     }
 

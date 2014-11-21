@@ -23,12 +23,10 @@ QStringList Dir::entryList() {
 }
 
 QQmlListProperty<File> Dir::files() {
-    if(getList().isEmpty()) {
-        foreach(QString s, entryList()) {
-            qDebug() << "abs file path " << absoluteFilePath(s);
+    if(getList().isEmpty())
+        foreach(QString s, entryList())
             getList().append(new File(absoluteFilePath(s), this));
-        }
-    }
+
     return m_fileList;
 }
 
