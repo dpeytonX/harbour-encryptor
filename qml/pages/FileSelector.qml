@@ -19,16 +19,15 @@ Dialog {
     property alias header: listView.header
     property alias sort: fileList.sort
     property bool multiSelect: false
-    property bool quickSelect: false //should be based on file filter
-    property string acceptText
+    property bool quickSelect: true //should be based on file filter
+    property int selectionFilter: Dir.AllEntries | Dir.Readable | Dir.Hidden
+    property string acceptText: directory.dirName
     property string baseDirectory: fileList.XdgHome
     property string cancelText
     property string deselectText
     property string headerTitle
     property string selectText
     property variant selectedFiles: []
-
-    property enumeration myval
 
     canAccept: !!selectedFiles && !!(selectedFiles.length)
     id: fileSelector
@@ -51,6 +50,7 @@ Dialog {
         delegate: ListItem {
             id: contentItem
             menu: contextMenuComponent
+            showMenuOnPressAndHold: !!file && matchSelectionFilter(file)
             property bool selected: false
             property File file: modelData
 
@@ -66,7 +66,7 @@ Dialog {
                 anchors.left: icon.right
                 anchors.leftMargin: Theme.paddingSmall
                 anchors.verticalCenter: parent.verticalCenter
-                color: selected ? Theme.primaryColor : Theme.highlightColor
+                color: selected ? Theme.primaryColor : (matchSelectionFilter(file) ? Theme.highlightColor : Theme.secondaryHighlightColor)
                 text: file.fileName
             }
 
@@ -98,7 +98,7 @@ Dialog {
 
     Dir {
         id: fileList
-        filter: Dir.NoFilter
+        filter: Dir.AllEntries | Dir.Hidden
         sort: Dir.DirsFirst | Dir.Name
 
         onPathChanged: {clearSelection(); refresh()}
@@ -120,6 +120,9 @@ Dialog {
 
             li.selected = false
         } else {
+            if(!matchSelectionFilter(li.file))
+                return
+
             if(!multiSelect) {
                 //remove previous entries
                 for(var i = 0; i < listView.selectedListItems.length; i++) {
@@ -137,6 +140,21 @@ Dialog {
         canAccept = selectedFiles.length
     }
 
+    function matchSelectionFilter(file) {
+        if((selectionFilter & Dir.Readable) && !file.readable) return false
+        if((selectionFilter & Dir.Writable) && !file.writable) return false
+        if((selectionFilter & Dir.Executable) && !file.executable) return false
+        if((selectionFilter & Dir.NoSymLinks) && file.symLink) return false
+        if(!(selectionFilter & Dir.Hidden) && file.hidden) return false
+
+        if(selectionFilter & Dir.AllEntries) return true
+        if(selectionFilter & Dir.Dirs & Dir.Files) return true
+
+        if((selectionFilter & Dir.Dirs) && !file.dir) return false
+        if((selectionFilter & Dir.AllDirs) && !file.dir) return false
+        if((selectionFilter & Dir.Files) && file.dir) return false
+        return true
+    }
 }
 
 

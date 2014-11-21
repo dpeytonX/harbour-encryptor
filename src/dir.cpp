@@ -19,7 +19,7 @@ Dir::Dir(QObject *parent) :
 }
 
 QStringList Dir::entryList() {
-    return QDir::entryList(Filters(m_filter) | QDir::Readable, SortFlags(m_sort));
+    return QDir::entryList(Filters(m_filter) | QDir::Readable | QDir::NoDot, SortFlags(m_sort));
 }
 
 QQmlListProperty<File> Dir::files() {

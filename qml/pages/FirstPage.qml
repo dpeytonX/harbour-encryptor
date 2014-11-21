@@ -24,10 +24,7 @@ Page {
 
         FileSelector {
             acceptText: canAccept ? selectedFiles.length + " file(s)" : directory.dirName
-            headerTitle: ""
             id: fileSelector
-            quickSelect: true
-            filter: Dir.AllEntries | Dir.Hidden
             selectText: "Select"
             deselectText: "Deselect"
 
