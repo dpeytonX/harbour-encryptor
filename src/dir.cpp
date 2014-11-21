@@ -1,7 +1,5 @@
 #include "dir.h"
 
-#include <qdebug.h>
-
 const QString Dir::m_configDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
 const QString Dir::m_dataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 const QString Dir::m_cacheDir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
@@ -50,7 +48,6 @@ void Dir::setPath(const QString &p) {
     QDir nPath(p);
     //Weird workaround for inifinite /../..
     QDir::setPath(nPath.path() == "/.." ? "/" : nPath.absolutePath());
-    qDebug() << "path is now " << path();
     emit pathChanged();
 }
 

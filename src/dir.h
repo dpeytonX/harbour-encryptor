@@ -8,8 +8,6 @@
 #include <QString>
 #include <QQmlListProperty>
 
-#include <QDebug>
-
 #include "file.h"
 
 /**
