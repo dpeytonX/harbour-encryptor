@@ -1,4 +1,5 @@
 #include "dir.h"
+
 #include <qdebug.h>
 
 const QString Dir::m_configDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
@@ -18,6 +19,8 @@ Dir::Dir(QObject *parent) :
 
 }
 
+QString Dir::dirName() const { return isRoot() ? root().path() : QDir::dirName(); }
+
 QStringList Dir::entryList() {
     return QDir::entryList(Filters(m_filter) | QDir::Readable | QDir::NoDot, SortFlags(m_sort));
 }
@@ -30,3 +33,30 @@ QQmlListProperty<File> Dir::files() {
     return m_fileList;
 }
 
+int Dir::filter() const { return m_filter; }
+
+void Dir::refresh() {
+    clearList();
+    files();
+    emit filesChanged();
+}
+
+void Dir::setFilter(int filter) {
+    m_filter = filter;
+    emit filterChanged();
+}
+
+void Dir::setPath(const QString &p) {
+    QDir nPath(p);
+    //Weird workaround for inifinite /../..
+    QDir::setPath(nPath.path() == "/.." ? "/" : nPath.absolutePath());
+    qDebug() << "path is now " << path();
+    emit pathChanged();
+}
+
+void Dir::setSort(int sort) {
+    m_sort = sort;
+    emit sortChanged();
+}
+
+int Dir::sort() const { return m_sort; }

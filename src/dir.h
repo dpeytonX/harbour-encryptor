@@ -1,9 +1,10 @@
 #ifndef FILELIST_H
 #define FILELIST_H
 
-#include <QStandardPaths>
 #include <QDir>
+#include <QList>
 #include <QObject>
+#include <QStandardPaths>
 #include <QString>
 #include <QQmlListProperty>
 
@@ -87,45 +88,23 @@ public:
     };
     /*** End: Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies). Under GPL Version 3 License ***/
 
+    QString dirName() const;
+
     QStringList entryList();
 
     QQmlListProperty<File> files();
 
-    Q_INVOKABLE void refresh() {
-        clearList();
-        files();
-        emit filesChanged();
-    }
+    int filter() const;
 
-    QString dirName() const {
-        return isRoot() ? root().path() : QDir::dirName();
-    }
+    Q_INVOKABLE void refresh();
 
-    int filter() const {
-        return m_filter;
-    }
+    void setFilter(int filter);
 
-    void setFilter(int filter) {
-        m_filter = filter;
-        emit filterChanged();
-    }
+    void setPath(const QString &p);
 
-    void setPath(const QString &p) {
-        QDir nPath(p);
-        //Weird workaround for inifinite /../..
-        QDir::setPath(nPath.path() == "/.." ? "/" : nPath.absolutePath());
-        qDebug() << "path is now " << path();
-        emit pathChanged();
-    }
+    void setSort(int sort);
 
-    int sort() const {
-        return m_sort;
-    }
-
-    void setSort(int sort) {
-        m_sort = sort;
-        emit sortChanged();
-    }
+    int sort() const;
 
     QList<File *>& getList() {
         return m_list;
