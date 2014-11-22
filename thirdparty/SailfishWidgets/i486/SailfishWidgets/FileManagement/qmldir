@@ -1,4 +1,4 @@
-module harbour.encryptor.SailfishWidgets.FileManagement
+module SailfishWidgets.FileManagement
 versioner 1.2 version.qml
 FileSelector 1.2 FileSelector.qml
 plugin filemanagement

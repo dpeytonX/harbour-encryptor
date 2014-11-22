@@ -1,4 +1,4 @@
-module harbour.encryptor.SailfishWidgets.Settings
+module SailfishWidgets.Settings
 versioner 1.2 version.qml
 plugin applicationsettings
 typeinfo settings.qmltypes
