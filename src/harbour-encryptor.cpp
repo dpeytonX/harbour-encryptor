@@ -35,8 +35,6 @@
 #include <QtQml>
 
 #include <sailfishapp.h>
-#include "dir.h"
-#include "file.h"
 
 
 int main(int argc, char *argv[])
@@ -49,9 +47,6 @@ int main(int argc, char *argv[])
     //   - SailfishApp::pathTo(QString) to get a QUrl to a resource file
     //
     // To display the view, call "show()" (will show fullscreen on device).
-
-    qmlRegisterType<Dir>("harbour.encryptor.Encryptor", 1, 0, "Dir");
-    qmlRegisterType<File>("harbour.encryptor.Encryptor", 1, 0, "File");
 
     return SailfishApp::main(argc, argv);
 }

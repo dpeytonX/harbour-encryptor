@@ -1,8 +1,8 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import harbour.encryptor.SailfishWidgets.Components 1.2
-import harbour.encryptor.SailfishWidgets.JS 1.1
-import harbour.encryptor.Encryptor 1.0
+import "../Components" 1.2
+import "../JS" 1.2
+import "." 1.2
 
 /*!
   Only handles selecting files and returns those files back to user

@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import harbour.encryptor.SailfishWidgets.Components 1.1
-import harbour.encryptor.Encryptor 1.0
+import harbour.encryptor.SailfishWidgets.Components 1.2
+import harbour.encryptor.SailfishWidgets.FileManagement 1.2
 
 Page {
 

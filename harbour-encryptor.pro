@@ -14,9 +14,7 @@ TARGET = harbour-encryptor
 
 CONFIG += sailfishapp
 
-SOURCES += src/harbour-encryptor.cpp \
-    src/dir.cpp \
-    src/file.cpp
+SOURCES += src/harbour-encryptor.cpp
 
 OTHER_FILES += qml/harbour-encryptor.qml \
     qml/cover/* \
@@ -35,7 +33,3 @@ INSTALLS += encryptor
 # following CONFIG line
 CONFIG += sailfishapp_i18n
 TRANSLATIONS += translations/harbour-encryptor-de.ts
-
-HEADERS += \
-    src/dir.h \
-    src/file.h
