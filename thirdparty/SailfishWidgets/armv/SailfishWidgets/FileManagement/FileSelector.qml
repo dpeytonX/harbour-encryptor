@@ -20,7 +20,7 @@
 **
 **************************************************************************/
 
-import QtQuick 2.0
+import QtQuick 2.1
 import Sailfish.Silica 1.0
 import "../Components" 1.2
 import "../JS" 1.2
@@ -34,8 +34,8 @@ import "." 1.2
 
    Back to \l {Sailfish Widgets}
 
-  Displays a file system borwser that allows a user to select one or files
-  or directories by visually selecting files that are stored in a \c ListView
+  Displays a file system browser that allows a user to select one or more files
+  or directories that are stored in a \c ListView
  
   \image file_selector.png "File Selector in action"
   It uses the \l {Dir} Qt object which provides the directory list
@@ -252,7 +252,8 @@ Dialog {
         if((selectionFilter & Dir.NoSymLinks) && file.symLink) return false
         if(!(selectionFilter & Dir.Hidden) && file.hidden) return false
 
-        if(selectionFilter & Dir.AllEntries) return true
+        //if(selectionFilter & Dir.AllEntries) return true
+        if(selectionFilter & Dir.AllDirs & Dir.Files) return true
         if(selectionFilter & Dir.Dirs & Dir.Files) return true
 
         if((selectionFilter & Dir.Dirs) && !file.dir) return false

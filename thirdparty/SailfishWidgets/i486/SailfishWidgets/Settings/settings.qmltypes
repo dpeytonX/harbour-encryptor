@@ -26,7 +26,7 @@ Module {
         // QtQuick.
         exports: [
             "Settings 1.1",
-            "SailfishWidgets/Settings 1.1"
+            "SailfishWidgets/Settings 1.1",
             "Settings 1.2",
             "SailfishWidgets/Settings 1.2"
         ]
@@ -49,7 +49,14 @@ Module {
             name: "fileName"
             type: "string"
         }
+
+        Method { name: "refresh" }
         
         Signal { name: "settingsInitialized" }
+
+        Signal { 
+            name: "settingsPropertyUpdated"
+            parameter: {name: "name"; type: "string"}
+        }
     }
 }
